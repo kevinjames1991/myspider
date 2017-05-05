@@ -1,28 +1,44 @@
 package com.crawl;
 
+
+import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Test {
+	private static final ExecutorService SERVICE = Executors.newFixedThreadPool(5);
+	private static final Logger logger = LoggerFactory.getLogger(Test.class);
 	
 	public static void main(String[] args) throws Exception {
 		
-		String html = "<html><head><title>开源中国社区</title></head>"
-				+"<body><p>这里是jsoup 项目的相关文章</p></body></html>";
-		Document doc = Jsoup.parse(html);
-		
-		System.out.println(doc.getAllElements().get(1));
-		
-		doc = Jsoup.connect("http://www.xiyanghui.com/women/2").get();
-		
-		System.out.println(doc.getAllElements().get(1));
-		
-		Element title = doc.select("div.title").first();
-		
-		System.out.println(title);
-		 
-		
+		for (int i = 1; i < 10; i++) {
+			String baseUrl = "http://www.xiyanghui.com/women/"+i;
+			SERVICE.submit(() -> {
+				Document doc;
+				try {
+					doc = Jsoup.connect(baseUrl).get();
+					Elements titles = doc.select("div.title");
+					for (Iterator<Element> iterator = titles.iterator(); iterator.hasNext();) {
+						Element title = iterator.next();
+						Element sElement = title.select("a").first();
+						String productUrl = sElement.attr("href");
+						Document docProduct = Jsoup.connect(productUrl).get();
+						System.out.println(docProduct.select("h5").first().text());
+					}
+				} catch (Exception e) {
+					logger.error(baseUrl+"=====error"+e);
+				}
+			});
+		}
+		SERVICE.shutdown();
+		System.out.println("finish");
 	}
 
 }
