@@ -5,7 +5,7 @@ import org.apache.http.client.methods.HttpGet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Test {
+public class TestMatcher {
     public static int j = 0;
     public static synchronized void add(){
         j++;

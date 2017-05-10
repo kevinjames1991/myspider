@@ -1,4 +1,4 @@
-package com.crawl.zhihu.dao;
+package com.crawl.xiyanghui.dao;
 
 import com.crawl.core.dao.ConnectionManager;
 import com.crawl.zhihu.entity.User;

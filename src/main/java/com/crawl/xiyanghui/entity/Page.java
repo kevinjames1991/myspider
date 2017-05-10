@@ -1,4 +1,4 @@
-package com.crawl.zhihu.entity;
+package com.crawl.xiyanghui.entity;
 
 
 import com.crawl.proxy.entity.Proxy;

@@ -1,4 +1,4 @@
-package com.crawl.zhihu.parser;
+package com.crawl.xiyanghui.parser;
 
 import com.crawl.core.parser.DetailPageParser;
 import com.crawl.zhihu.entity.Page;

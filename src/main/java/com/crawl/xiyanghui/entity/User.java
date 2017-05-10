@@ -1,4 +1,4 @@
-package com.crawl.zhihu.entity;
+package com.crawl.xiyanghui.entity;
 
 /**
  * 知乎用户资料
