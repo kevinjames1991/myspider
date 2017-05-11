@@ -14,7 +14,6 @@ import java.util.List;
 
 import javax.net.ssl.SSLContext;
 
-import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;

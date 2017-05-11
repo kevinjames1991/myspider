@@ -13,12 +13,14 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
+import org.apache.http.client.RedirectStrategy;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -30,19 +32,24 @@ import org.apache.http.util.EntityUtils;
 
 public class HttpClientTest2 {
 
+	private static final String loginUrl = "http://ha66.net/LoadData/Pd.ashx";
+	private static final String inUrl = "http://tv222.net/index.aspx";
+	private static final String loginUrlM = "https://manager.modernavenue.com/manager/loginservice/login.kn";
+	private static final String inUrlM = "https://manager.modernavenue.com/manager/buyerinfoservice/findBuyerInfoPage.kn";
 	public static void main(String[] args) {
 		// 创建一个HttpClient
 		RequestConfig requestConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.DEFAULT).build();
 		BasicCookieStore cookieStore = new BasicCookieStore();
-		CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig)
+		CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig).disableRedirectHandling()
 				.setDefaultCookieStore(cookieStore).build();
 		HttpContext context = new BasicHttpContext();
 		try {
-			// 创建一个get请求用来接收_xsrf信息
-			// HttpGet get = new HttpGet("https://imp.modernavenue.com/login");
-			// // 获取_xsrf
-			// CloseableHttpResponse response = httpClient.execute(get);
-			// System.out.println(setCookie(response));
+//			 创建一个get请求用来接收_xsrf信息
+			 HttpGet get = new HttpGet(loginUrl);
+			 // 获取_xsrf
+			 CloseableHttpResponse response = httpClient.execute(get);
+			 printResponse(response);
+			 System.out.println(setCookie(response));
 			// String responseHtml = EntityUtils.toString(response.getEntity());
 			// String xsrfValue = responseHtml.split("<input type=\"hidden\"
 			// name=\"_xsrf\" value=\"")[1].split("\"/>")[0];
@@ -52,29 +59,31 @@ public class HttpClientTest2 {
 			// 构造post数据
 			List<NameValuePair> valuePairs = new LinkedList<NameValuePair>();
 			// valuePairs.add(new BasicNameValuePair("_xsrf", xsrfValue));
-			valuePairs.add(new BasicNameValuePair("loginname", "275648393@qq.com"));
-			valuePairs.add(new BasicNameValuePair("nloginpwd", "czw663662123"));
-			valuePairs.add(new BasicNameValuePair("email", "275648393@qq.com"));
-			valuePairs.add(new BasicNameValuePair("username", "zhangyf123"));
-			valuePairs.add(new BasicNameValuePair("password", "czw663662123"));
-			valuePairs.add(new BasicNameValuePair("account", "chenzhangwei"));
-			valuePairs.add(new BasicNameValuePair("ps", "chenzhangwei2017011"));
+//			valuePairs.add(new BasicNameValuePair("loginname", "275648393@qq.com"));
+//			valuePairs.add(new BasicNameValuePair("nloginpwd", "czw663662123"));
+//			valuePairs.add(new BasicNameValuePair("email", "275648393@qq.com"));
+//			valuePairs.add(new BasicNameValuePair("username", "zhangyf123"));
+//			valuePairs.add(new BasicNameValuePair("password", "czw663662123"));
+//			valuePairs.add(new BasicNameValuePair("account", "chenzhangwei"));
+//			valuePairs.add(new BasicNameValuePair("ps", "chenzhangwei2017011"));
+			valuePairs.add(new BasicNameValuePair("txtUser", "ds6265"));
+			valuePairs.add(new BasicNameValuePair("txtPassword", "czw663662"));
 			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(valuePairs, Consts.UTF_8);
 			// 创建一个post请求
-			HttpPost post = new HttpPost("https://manager.modernavenue.com/manager/loginservice/login.kn");
+			HttpPost post = new HttpPost(loginUrl);
 			// 注入post数据
 			post.setEntity(entity);
 			
 			// 创建一个GET请求
-//			String str = EntityUtils.toString(new UrlEncodedFormEntity(valuePairs, Consts.UTF_8));
-//			HttpGet httpget = new HttpGet("http://manager.modernavenue.com/manager/loginservice/login.kn?" + str);
+			String str = EntityUtils.toString(new UrlEncodedFormEntity(valuePairs, Consts.UTF_8));
+			HttpGet httpget = new HttpGet(loginUrl+"?" + str);
 			
-			CloseableHttpResponse httpResponse = httpClient.execute(post,context);
+			CloseableHttpResponse httpResponse = httpClient.execute(httpget,context);
 			// 打印登录是否成功信息
 //			printResponse(httpResponse);
 			System.out.println(EntityUtils.toString(httpResponse.getEntity()));
 			// 构造一个get请求，用来测试登录cookie是否拿到
-			HttpGet g = new HttpGet("https://manager.modernavenue.com/manager/buyerinfoservice/findBuyerInfoPage.kn");
+			HttpGet g = new HttpGet(inUrl);
 			
 			// 得到post请求返回的cookie信息
 			String c = setCookie(httpResponse);
