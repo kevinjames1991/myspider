@@ -4,6 +4,7 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomElement;
+import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
@@ -23,7 +24,7 @@ public class HTMLUnitTest {
 				.getCredentialsProvider();
 		credentialsProvider.addCredentials("username", "password");
 
-		HtmlPage page = webClient.getPage("http://ju11.net/");
+		HtmlPage page = webClient.getPage("http://th55.net/SiteSort/TS111/index.aspx");
 		HtmlForm loginForm = (HtmlForm) page.getElementById("form1");
 
 		// HtmlInput username = loginForm.getInputByName("txt_userid");
@@ -46,34 +47,43 @@ public class HTMLUnitTest {
 		webClient.waitForBackgroundJavaScript(30000);
 		String resultStr = resultP.asXml();
 //		System.out.println(resultStr);
-		
 		DomElement domElement = resultP.getElementById("aTvpd");
 		HtmlPage domElementTv = domElement.click();
-//		System.out.println(domElementTv.asXml());
+		System.out.println("===============domElementTv=========");
 		DomElement domElement1 = domElementTv.getElementById("topmenu1");
 		HtmlPage domElementAv = domElement1.click();
 //		System.out.println(domElementAv.asXml());
-		domElements = domElementAv.getElementsByTagName("a");
-		for (DomElement temp : domElements) {
-			if (temp.getAttribute("class").equals("ny-ypjslj-a")) {
-				HtmlPage domElementAvTemp = temp.click();
-//				System.out.println(domElementAvTemp.asXml());
-				DomNodeList<DomElement> elemets = domElementAvTemp.getElementsByTagName("a");
-				for (DomElement temp1 : elemets){
-					if (temp1.getAttribute("class").equals("ypjs-xx-jsani")) {
-						HtmlPage domElementAvTempD = temp1.click();
-						System.out.println(domElementAvTempD.asXml());
-						System.out.println("===========================================");
-						System.out.println("===========================================");
-						System.out.println("===========================================");
-						System.out.println(domElementAvTempD.getElementById("hidevalue_url").asXml());
-						System.out.println(domElementAvTempD.getElementById("hidevalue_url").getAttribute("value"));
-						break;
+		
+//		DomNodeList<DomNode> domNodeList = domElementAv.querySelectorAll(".NextClass");
+//		for (DomNode domNode : domNodeList) {
+//		}
+		
+		//跳转到尾页
+		domElements = domElementAv.getElementsByTagName("input");
+		System.out.println("===============domElements=========");
+		for (DomElement tempDom : domElements) {
+			if (tempDom.getAttribute("class").equals("NexClass") && tempDom.getAttribute("value").trim().equals("尾頁")) {
+				System.out.println("===============NexClass=========");
+				domElementAv = tempDom.click();
+				//获取页面内容，再一页一页往上翻
+				domElements = domElementAv.getElementsByTagName("a");
+				for (DomElement temp : domElements) {
+					if (temp.getAttribute("class").equals("ny-ypjslj-a")) {
+						HtmlPage domElementAvTemp = temp.click();
+						System.out.println(domElementAvTemp.getElementById("ContentPlaceHolder1_title").asText());
+						DomNodeList<DomElement> elemets = domElementAvTemp.getElementsByTagName("a");
+						for (DomElement temp1 : elemets){
+							if (temp1.getAttribute("class").equals("ypjs-xx-jsani")) {
+								HtmlPage domElementAvTempD = temp1.click();
+								System.out.println(domElementAvTempD.getElementById("hidevalue_url").getAttribute("value"));
+								break;
+							}
+						}
 					}
 				}
-				break;
 			}
 		}
+		
 		//????????????????????????????????????如何带上cookie登陆
 		System.exit(0);
 		
