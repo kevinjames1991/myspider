@@ -4,78 +4,48 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomElement;
-import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.DomNodeList;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 public class HTMLUnitTest {
 
 	public static void main(String[] args) throws Exception {
-		WebClient webClient = new WebClient(BrowserVersion.CHROME);
-		webClient.getOptions().setCssEnabled(true);
-		webClient.getOptions().setJavaScriptEnabled(true);
-		webClient.getOptions().setThrowExceptionOnScriptError(false);
-		webClient.getOptions().setTimeout(10000);
-
-		DefaultCredentialsProvider credentialsProvider = (DefaultCredentialsProvider) webClient
-				.getCredentialsProvider();
-		credentialsProvider.addCredentials("username", "password");
-
-		HtmlPage page = webClient.getPage("http://th55.net/SiteSort/TS111/index.aspx");
-		HtmlForm loginForm = (HtmlForm) page.getElementById("form1");
-
-		// HtmlInput username = loginForm.getInputByName("txt_userid");
-		// HtmlInput password = loginForm.getInputByName("txt_userpw");
-
-		HtmlInput username = (HtmlInput) page.getElementById("txtUser");
-		HtmlInput password = (HtmlInput) page.getElementById("txtPassword");
-		username.setValueAttribute("ds6265");
-		password.setValueAttribute("czw663662");
-
-		DomElement submit = null;
-
-		DomNodeList<DomElement> domElements = page.getElementsByTagName("a");
-		for (DomElement temp : domElements) {
-			if (temp.getAttribute("class").equals("login")) {
-				submit = temp;
-			}
-		}
-		HtmlPage resultP = submit.click();
-		webClient.waitForBackgroundJavaScript(30000);
-		String resultStr = resultP.asXml();
-//		System.out.println(resultStr);
-		DomElement domElement = resultP.getElementById("aTvpd");
+		HTMLUnitTest htmlUnitTest = new HTMLUnitTest();
+		WebClient webClient = htmlUnitTest.getWebClient();
+		HtmlPage loginPage = htmlUnitTest.login(webClient, "http://th55.net/SiteSort/TS111/index.aspx");
+		DomElement domElement = loginPage.getElementById("aTvpd");
 		HtmlPage domElementTv = domElement.click();
 		System.out.println("===============domElementTv=========");
 		DomElement domElement1 = domElementTv.getElementById("topmenu1");
 		HtmlPage domElementAv = domElement1.click();
-//		System.out.println(domElementAv.asXml());
+		Thread.sleep(10000);
+		
 		
 //		DomNodeList<DomNode> domNodeList = domElementAv.querySelectorAll(".NextClass");
 //		for (DomNode domNode : domNodeList) {
 //		}
-		
 		//跳转到尾页
-		domElements = domElementAv.getElementsByTagName("input");
-		System.out.println("===============domElements=========");
+		DomNodeList<DomElement> domElements = domElementAv.getElementsByTagName("input");
 		for (DomElement tempDom : domElements) {
+			System.out.println(tempDom.getAttribute("class"));
+			//获取尾页页面内容
 			if (tempDom.getAttribute("class").equals("NexClass") && tempDom.getAttribute("value").trim().equals("尾頁")) {
-				System.out.println("===============NexClass=========");
-				domElementAv = tempDom.click();
-				//获取页面内容，再一页一页往上翻
-				domElements = domElementAv.getElementsByTagName("a");
-				for (DomElement temp : domElements) {
+				HtmlPage domElementAvEnd = tempDom.click();
+				Thread.sleep(10000);
+				System.out.println(domElementAvEnd.asXml());
+				DomNodeList<DomElement> domElementsEnd = domElementAvEnd.getElementsByTagName("a");
+				//遍历一页中的所有
+				for (DomElement temp : domElementsEnd) {
 					if (temp.getAttribute("class").equals("ny-ypjslj-a")) {
-						HtmlPage domElementAvTemp = temp.click();
-						System.out.println(domElementAvTemp.getElementById("ContentPlaceHolder1_title").asText());
-						DomNodeList<DomElement> elemets = domElementAvTemp.getElementsByTagName("a");
-						for (DomElement temp1 : elemets){
+						HtmlPage domElementAvDetail = temp.click();
+						System.out.println(domElementAvDetail.getElementById("ContentPlaceHolder1_title").asText());
+						DomNodeList<DomElement> elemetsDetail = domElementAvDetail.getElementsByTagName("a");
+						for (DomElement temp1 : elemetsDetail){
+							//进入播放页获取视频链接
 							if (temp1.getAttribute("class").equals("ypjs-xx-jsani")) {
-								HtmlPage domElementAvTempD = temp1.click();
-								System.out.println(domElementAvTempD.getElementById("hidevalue_url").getAttribute("value"));
+								HtmlPage domElementAvPlay = temp1.click();
+								System.out.println(domElementAvPlay.getElementById("hidevalue_url").getAttribute("value"));
 								break;
 							}
 						}
@@ -93,7 +63,7 @@ public class HTMLUnitTest {
 		
 		
 
-		@SuppressWarnings("resource")
+	/*	@SuppressWarnings("resource")
 		WebClient webClient2 = new WebClient();// 创建WebClient
 		page = webClient2.getPage("http://ju11.net/"); // 打开百度
 
@@ -120,6 +90,40 @@ public class HTMLUnitTest {
 			System.out.println("登陆成功");
 		} else {
 			System.out.println("登陆失败");
+		}*/
+	}
+	
+	public WebClient getWebClient() {
+		WebClient webClient = new WebClient(BrowserVersion.CHROME);
+		webClient.getOptions().setCssEnabled(true);
+		webClient.getOptions().setJavaScriptEnabled(true);
+		webClient.getOptions().setThrowExceptionOnScriptError(false);
+		webClient.getOptions().setTimeout(10000);
+		return webClient;
+	}
+	
+	public HtmlPage login(WebClient webClient,String url) throws Exception{
+		DefaultCredentialsProvider credentialsProvider = (DefaultCredentialsProvider) webClient
+				.getCredentialsProvider();
+		credentialsProvider.addCredentials("username", "password");
+
+		HtmlPage page = webClient.getPage(url);
+		HtmlInput username = (HtmlInput) page.getElementById("txtUser");
+		HtmlInput password = (HtmlInput) page.getElementById("txtPassword");
+		username.setValueAttribute("ds6265");
+		password.setValueAttribute("czw663662");
+
+		DomElement submit = null;
+
+		DomNodeList<DomElement> domElements = page.getElementsByTagName("a");
+		for (DomElement temp : domElements) {
+			if (temp.getAttribute("class").equals("login")) {
+				submit = temp;
+			}
 		}
+		HtmlPage loginPage = submit.click();
+		webClient.waitForBackgroundJavaScript(30000);
+//		System.out.println(resultP.asXml());
+		return loginPage;
 	}
 }
