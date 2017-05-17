@@ -64,8 +64,37 @@ public class XiyanghuiNewUserDetailPageParser implements DetailPageParser {
     private void getProductInfo(ProductInfo info, String productUrl){
     	try {
     		Page page = ZhiHuHttpClient.getInstance().getWebPage(productUrl);
-    		System.out.println(page.getHtml());
-    		System.exit(0);
+    		String pageHtml = page.getHtml();
+    		Document doc = Jsoup.parse(pageHtml);
+    		//获取产品图片
+    		Elements photos = doc.select(".prd-images").select(".clearfix").select(".col-md-7").select(".product-show").first().select("[data-origin]");
+    		for (Element photo : photos) {
+				System.out.println(photo.attr("data-origin"));
+			}
+    		//获取产品详细信息
+    		Element details = doc.select(".prd-desc").select(".col-md-5").first();
+    		String subjectId = productUrl.replace("http://www.xiyanghui.com/product/", "");
+    		String brandname = details.select(".brand").first().select("a").first().html();
+    		String productNo = details.select(".product-id").first().text();
+    		String longname = details.select(".title").first().html();
+    		String origin = details.select(".col-sm-7").first().select("a").first().attr("title");
+    		String originPriceNow = details.select(".cur").first().html();
+    		String originPriceWas = details.select(".old").first().html();
+    		String discount = details.select(".discount").first().html();
+    		Elements sizes = doc.select(".size-guide").select("button");
+    		StringBuffer sizeBuf = new StringBuffer("");
+    		for (Element element : sizes) {
+				sizeBuf.append(element.attr("data-key")+"  ");
+			}
+    		String desc = details.select(".panel-body").select(".desc").first().html();
+    		String brandDesc = details.select(".panel-body").select(".brand_desc").first().text().replaceAll("查看此品牌全部商品", "");
+    		String shopDesc = details.select(".panel-body").select(".site_desc").first().text().replaceAll("查看此商家全部商品", "");
+    		String size = sizeBuf.toString();
+    		System.out.println(subjectId);
+    		System.out.println(productNo+brandname+longname+origin+originPriceNow+originPriceWas+discount+size);
+    		System.out.println(desc);
+    		System.out.println(brandDesc);
+    		System.out.println(shopDesc);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

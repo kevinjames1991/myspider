@@ -1,19 +1,16 @@
 package com.crawl.jiuzhou;
 
+import java.io.IOException;
+
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.NTCredentials;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.cookie.CookieSpec;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-
-import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * 爬取新安人才网信息
