@@ -35,6 +35,7 @@ public class ZhiHuNewUserDetailPageParser implements DetailPageParser {
     @Override
     public User parse(Page page) {
         Document doc = Jsoup.parse(page.getHtml());
+        System.out.println(page.getHtml());
         User user = new User();
         String userToken = getUserToken(page.getUrl());
         user.setUserToken(userToken);

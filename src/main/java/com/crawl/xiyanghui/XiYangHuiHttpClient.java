@@ -1,23 +1,21 @@
 package com.crawl.xiyanghui;
 
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.log4j.Logger;
+
+import com.crawl.core.dao.ConnectionManager;
 import com.crawl.core.httpclient.AbstractHttpClient;
 import com.crawl.core.httpclient.IHttpClient;
 import com.crawl.core.util.Config;
-import com.crawl.core.dao.ConnectionManager;
+import com.crawl.core.util.SimpleLogger;
+import com.crawl.core.util.ThreadPoolMonitor;
 import com.crawl.proxy.ProxyHttpClient;
 import com.crawl.xiyanghui.task.XiyanghuiPageTask;
 import com.crawl.zhihu.dao.ZhiHuDAO;
-import com.crawl.core.util.HttpClientUtil;
-import com.crawl.core.util.SimpleLogger;
-import com.crawl.core.util.ThreadPoolMonitor;
-import com.crawl.zhihu.task.DetailPageTask;
-import org.apache.log4j.Logger;
-
-import java.io.IOException;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class XiYangHuiHttpClient extends AbstractHttpClient implements IHttpClient{
     private static Logger logger = SimpleLogger.getSimpleLogger(XiYangHuiHttpClient.class);
@@ -47,13 +45,10 @@ public class XiYangHuiHttpClient extends AbstractHttpClient implements IHttpClie
      * 列表页下载网页线程池
      */
     private ThreadPoolExecutor listPageThreadPool;
-    /**
-     * request　header
-     */
-    private static String authorization;
     private XiYangHuiHttpClient() {
         initHttpClient();
         intiThreadPool();
+        //开启监控线程,观察爬取线程的状态
         new Thread(new ThreadPoolMonitor(detailPageThreadPool, "DetailPageDownloadThreadPool")).start();
         new Thread(new ThreadPoolMonitor(listPageThreadPool, "ListPageDownloadThreadPool")).start();
     }
@@ -62,7 +57,6 @@ public class XiYangHuiHttpClient extends AbstractHttpClient implements IHttpClie
      */
     @Override
     public void initHttpClient() {
-        authorization = initAuthorization();
         if(Config.dbEnable){
             ZhiHuDAO.DBTablesInit(ConnectionManager.getConnection());
         }
@@ -80,49 +74,12 @@ public class XiYangHuiHttpClient extends AbstractHttpClient implements IHttpClie
                 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>());
     }
+    
     public void startCrawl(String url){
         detailPageThreadPool.execute(new XiyanghuiPageTask(url, Config.isProxy));
         manageHttpClient();
     }
-
     /**
-     * 初始化authorization
-     * @return
-     */
-    private String initAuthorization(){
-        String content = null;
-        try {
-            content = HttpClientUtil.getWebPage(Config.startURL);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Pattern pattern = Pattern.compile("https://static\\.zhihu\\.com/heifetz/main\\.app\\.([0-9]|[a-z])*\\.js");
-        Matcher matcher = pattern.matcher(content);
-        String jsSrc = null;
-        if (matcher.find()){
-            jsSrc = matcher.group(0);
-        } else {
-            throw new RuntimeException("not find javascript url");
-        }
-        String jsContent = null;
-        try {
-            jsContent = HttpClientUtil.getWebPage(jsSrc);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        pattern = Pattern.compile("CLIENT_ALIAS=\"(([0-9]|[a-z])*)\"");
-        matcher = pattern.matcher(jsContent);
-        if (matcher.find()){
-            String authorization = matcher.group(1);
-            return authorization;
-        }
-        throw new RuntimeException("not get authorization");
-    }
-    public static String getAuthorization(){
-        return authorization;
-    }
-    /**
-     * 管理知乎客户端
      * 关闭整个爬虫
      */
     public void manageHttpClient(){

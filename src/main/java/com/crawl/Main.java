@@ -17,7 +17,6 @@ public class Main {
         String startURL = Config.startURL;
 //        ProxyHttpClient.getInstance().startCrawl();
         System.out.println(startURL);
-//        ZhiHuHttpClient.getInstance().startCrawl(startURL);
-        XiYangHuiHttpClient.getInstance().startCrawl(startURL);
+        ZhiHuHttpClient.getInstance().startCrawl(startURL);
     }
 }

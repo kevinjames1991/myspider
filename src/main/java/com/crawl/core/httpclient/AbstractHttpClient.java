@@ -29,7 +29,6 @@ public abstract class AbstractHttpClient{
     }
     public Page getWebPage(String url, String charset) throws IOException {
         Page page = new Page();
-        System.out.println(charset);
         CloseableHttpResponse response = null;
         response = HttpClientUtil.getResponse(url);
         page.setStatusCode(response.getStatusLine().getStatusCode());

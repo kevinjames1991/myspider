@@ -19,16 +19,14 @@ public class HTMLUnitTest {
 		System.out.println("===============domElementTv=========");
 		DomElement domElement1 = domElementTv.getElementById("topmenu1");
 		HtmlPage domElementAv = domElement1.click();
-		Thread.sleep(10000);
-		
-		
+		System.out.println(domElementAv.asXml());
 //		DomNodeList<DomNode> domNodeList = domElementAv.querySelectorAll(".NextClass");
 //		for (DomNode domNode : domNodeList) {
 //		}
 		//跳转到尾页
 		DomNodeList<DomElement> domElements = domElementAv.getElementsByTagName("input");
 		for (DomElement tempDom : domElements) {
-			System.out.println(tempDom.getAttribute("class"));
+			System.out.println(tempDom.getAttribute("class")+"====="+tempDom.getAttribute("value"));
 			//获取尾页页面内容
 			if (tempDom.getAttribute("class").equals("NexClass") && tempDom.getAttribute("value").trim().equals("尾頁")) {
 				HtmlPage domElementAvEnd = tempDom.click();
@@ -51,6 +49,7 @@ public class HTMLUnitTest {
 						}
 					}
 				}
+				break;
 			}
 		}
 		

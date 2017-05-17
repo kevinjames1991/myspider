@@ -1,6 +1,8 @@
 package com.crawl.xiyanghui.parser;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,16 +11,18 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.crawl.core.parser.DetailPageParser;
 import com.crawl.xiyanghui.XiYangHuiHttpClient;
+import com.crawl.xiyanghui.entity.ProductInfo;
+import com.crawl.zhihu.ZhiHuHttpClient;
 import com.crawl.zhihu.entity.Page;
 import com.crawl.zhihu.entity.User;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 
 /**
- * https://www.zhihu.com/people/wo-yan-chen-mo/following
- * 新版following页面解析出用户详细信息
+ * 
+ * @author chenzhangwei
+ * @time 2017年5月16日下午4:13:44
  */
 public class XiyanghuiNewUserDetailPageParser implements DetailPageParser {
     private volatile static XiyanghuiNewUserDetailPageParser instance;
@@ -36,7 +40,8 @@ public class XiyanghuiNewUserDetailPageParser implements DetailPageParser {
 
     }
     @Override
-    public User parse(Page page) {
+    public List<ProductInfo> parse(Page page) {
+    	List<ProductInfo> infoList = new ArrayList<>();
         Document doc = Jsoup.parse(page.getHtml());
         Elements productElements = doc.getElementsByClass("product-item");
         for (Element element : productElements) {
@@ -45,56 +50,26 @@ public class XiyanghuiNewUserDetailPageParser implements DetailPageParser {
         	for (Element element2 : hrefElements) {
 				if (i%2 == 0) {
 					String productUrl = getProductId(element2.toString());
-					System.out.println(productUrl);
+					ProductInfo productInfo = new ProductInfo();
+					getProductInfo(productInfo,productUrl);
+					infoList.add(productInfo);
 				}else {
 					i++;
 					continue;
 				}
 			}
 		}
-        
-//        System.out.println("parse: "+doc.select("product-item").first().attr("div"));
-        User user = new User();
-//        String userToken = getUserToken(page.getUrl());
-//        user.setUserToken(userToken);
-//        user.setUrl("https://www.zhihu.com/people/" + userToken);//用户主页
-//        getUserByJson(user, userToken, doc.select("[data-state]").first().attr("data-state"));
-        return user;
+        return infoList;
     }
-    private void getUserByJson(User user, String userToken, String dataStateJson){
-
-        String type = "['" + userToken + "']";//转义
-        String commonJsonPath = "$.entities.users." + type;
-        try {
-            JsonPath.parse(dataStateJson).read(commonJsonPath);
-        } catch (PathNotFoundException e){
-            commonJsonPath = "$.entities.users.null";
-        }
-        setUserInfoByJsonPth(user, "username", dataStateJson, commonJsonPath + ".name");//username
-        setUserInfoByJsonPth(user, "hashId", dataStateJson, commonJsonPath + ".id");//hashId
-        setUserInfoByJsonPth(user, "followees", dataStateJson, commonJsonPath + ".followingCount");//关注人数
-        setUserInfoByJsonPth(user, "location", dataStateJson, commonJsonPath + ".locations[0].name");//位置
-        setUserInfoByJsonPth(user, "business", dataStateJson, commonJsonPath + ".business.name");//行业
-        setUserInfoByJsonPth(user, "employment", dataStateJson, commonJsonPath + ".employments[0].company.name");//公司
-        setUserInfoByJsonPth(user, "position", dataStateJson, commonJsonPath + ".employments[0].job.name");//职位
-        setUserInfoByJsonPth(user, "education", dataStateJson, commonJsonPath + ".educations[0].school.name");//学校
-        setUserInfoByJsonPth(user, "answers", dataStateJson, commonJsonPath + ".answerCount");//回答数
-        setUserInfoByJsonPth(user, "asks", dataStateJson, commonJsonPath + ".questionCount");//提问数
-        setUserInfoByJsonPth(user, "posts", dataStateJson, commonJsonPath + ".articlesCount");//文章数
-        setUserInfoByJsonPth(user, "followers", dataStateJson, commonJsonPath + ".followerCount");//粉丝数
-        setUserInfoByJsonPth(user, "agrees", dataStateJson, commonJsonPath + ".voteupCount");//赞同数
-        setUserInfoByJsonPth(user, "thanks", dataStateJson, commonJsonPath + ".thankedCount");//感谢数
-        try {
-            Integer gender = JsonPath.parse(dataStateJson).read(commonJsonPath + ".gender");
-            if (gender != null && gender == 1){
-                user.setSex("male");
-            }
-            else if(gender != null && gender == 0){
-                user.setSex("female");
-            }
-        } catch (PathNotFoundException e){
-            //没有该属性
-        }
+    private void getProductInfo(ProductInfo info, String productUrl){
+    	try {
+    		Page page = ZhiHuHttpClient.getInstance().getWebPage(productUrl);
+    		System.out.println(page.getHtml());
+    		System.exit(0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        
 
     }
 
