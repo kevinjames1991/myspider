@@ -1,6 +1,5 @@
 package com.crawl.xiyanghui.parser;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -10,33 +9,33 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.crawl.xiyanghui.XiYangHuiHttpClient;
 import com.crawl.xiyanghui.entity.ProductInfo;
 import com.crawl.zhihu.ZhiHuHttpClient;
 import com.crawl.zhihu.entity.Page;
-import com.crawl.zhihu.entity.User;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.PathNotFoundException;
 
 /**
  * 
  * @author chenzhangwei
  * @time 2017年5月16日下午4:13:44
  */
-public class XiyanghuiNewUserDetailPageParser implements DetailPageParser {
-    private volatile static XiyanghuiNewUserDetailPageParser instance;
-    public static XiyanghuiNewUserDetailPageParser getInstance(){
+public class XiyanghuiDetailPageParser implements DetailPageParser {
+	private static final Logger LOGGER = LoggerFactory.getLogger(XiyanghuiDetailPageParser.class);
+    private volatile static XiyanghuiDetailPageParser instance;
+    public static XiyanghuiDetailPageParser getInstance(){
         if (instance == null){
             synchronized (XiYangHuiHttpClient.class){
                 if (instance == null){
-                    instance = new XiyanghuiNewUserDetailPageParser();
+                    instance = new XiyanghuiDetailPageParser();
                 }
             }
         }
         return instance;
     }
-    private XiyanghuiNewUserDetailPageParser(){
+    private XiyanghuiDetailPageParser(){
 
     }
     @Override
@@ -96,30 +95,10 @@ public class XiyanghuiNewUserDetailPageParser implements DetailPageParser {
     		System.out.println(brandDesc);
     		System.out.println(shopDesc);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("parse error",e);
 		}
         
 
-    }
-
-    /**
-     * jsonPath获取值，并通过反射直接注入到user中
-     * @param user
-     * @param fieldName
-     * @param json
-     * @param jsonPath
-     */
-    private void setUserInfoByJsonPth(User user, String fieldName, String json, String jsonPath){
-        try {
-            Object o = JsonPath.parse(json).read(jsonPath);
-            Field field = user.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            field.set(user, o);
-        } catch (PathNotFoundException e1) {
-            //no results
-        } catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
     /**

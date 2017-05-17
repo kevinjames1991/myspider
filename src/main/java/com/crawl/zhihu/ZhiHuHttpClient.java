@@ -91,7 +91,7 @@ public class ZhiHuHttpClient extends AbstractHttpClient implements IHttpClient{
     private String initAuthorization(){
         String content = null;
         try {
-            content = HttpClientUtil.getWebPage(Config.startURL);
+            content = HttpClientUtil.getWebPage(Config.startURLZhihu);
         } catch (IOException e) {
             e.printStackTrace();
         }

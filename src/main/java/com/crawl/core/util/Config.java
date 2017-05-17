@@ -34,7 +34,11 @@ public class Config {
     /**
      * 爬虫入口
      */
-    public static String  startURL;
+    public static String  startURLZhihu;
+    /**
+     * 爬虫入口
+     */
+    public static String  startURLXiYangHui;
     /**
      * 下载网页数
      */
@@ -80,7 +84,8 @@ public class Config {
         verificationCodePath = p.getProperty("verificationCodePath");
         emailOrPhoneNum = p.getProperty("zhiHu.emailOrPhoneNum");
         password = p.getProperty("zhiHu.password");
-        startURL = p.getProperty("startURL");
+        startURLXiYangHui = p.getProperty("startURLXiYangHui");
+        startURLZhihu = p.getProperty("startURLZhihu");
         downloadPageCount = Integer.valueOf(p.getProperty("downloadPageCount"));
         downloadThreadSize = Integer.valueOf(p.getProperty("downloadThreadSize"));
         cookiePath = p.getProperty("cookiePath");

@@ -39,8 +39,7 @@ public class DetailPageTask extends AbstractPageTask {
     void handle(Page page) {
     	System.out.println("detail handle...............");
         DetailPageParser parser = null;
-//        parser = ZhiHuNewUserDetailPageParser.getInstance();
-        parser = proxyDetailPageParser;
+        parser = ZhiHuNewUserDetailPageParser.getInstance();
         User u = parser.parse(page);
         logger.info("解析用户成功:" + u.toString());
         if(Config.dbEnable){

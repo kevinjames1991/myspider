@@ -4,9 +4,9 @@ import com.crawl.core.util.HttpClientUtil;
 import com.crawl.proxy.ProxyPool;
 import com.crawl.proxy.entity.Direct;
 import com.crawl.proxy.entity.Proxy;
+import com.crawl.xiyanghui.XiYangHuiHttpClient;
 import com.crawl.zhihu.entity.Page;
 import com.crawl.core.util.SimpleLogger;
-import com.crawl.zhihu.ZhiHuHttpClient;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
@@ -29,7 +29,7 @@ public abstract class AbstractPageTask implements Runnable{
 	private boolean proxyFlag;//是否通过代理下载
 	private Proxy currentProxy;//当前线程使用的代理
 
-	protected static ZhiHuHttpClient zhiHuHttpClient = ZhiHuHttpClient.getInstance();
+	protected static XiYangHuiHttpClient xiYangHuiHttpClient = XiYangHuiHttpClient.getInstance();
 	public AbstractPageTask(){
 
 	}
@@ -55,9 +55,9 @@ public abstract class AbstractPageTask implements Runnable{
 						HttpHost proxy = new HttpHost(currentProxy.getIp(), currentProxy.getPort());
 						tempReqeust.setConfig(HttpClientUtil.getRequestConfigBuilder().setProxy(proxy).build());
 					}
-					page = zhiHuHttpClient.getWebPage(tempReqeust);
+					page = xiYangHuiHttpClient.getWebPage(tempReqeust);
 				}else {
-					page = zhiHuHttpClient.getWebPage(url);
+					page = xiYangHuiHttpClient.getWebPage(url);
 				}
 			}
 			if(request != null){
@@ -67,9 +67,9 @@ public abstract class AbstractPageTask implements Runnable{
 						HttpHost proxy = new HttpHost(currentProxy.getIp(), currentProxy.getPort());
 						request.setConfig(HttpClientUtil.getRequestConfigBuilder().setProxy(proxy).build());
 					}
-					page = zhiHuHttpClient.getWebPage(request);
+					page = xiYangHuiHttpClient.getWebPage(request);
 				}else {
-					page = zhiHuHttpClient.getWebPage(request);
+					page = xiYangHuiHttpClient.getWebPage(request);
 				}
 			}
 			page.setProxy(currentProxy);
@@ -111,7 +111,7 @@ public abstract class AbstractPageTask implements Runnable{
                  */
                 currentProxy.setFailureTimes(currentProxy.getFailureTimes() + 1);
             }
-            if(!zhiHuHttpClient.getDetailPageThreadPool().isShutdown()){
+            if(!xiYangHuiHttpClient.getDetailPageThreadPool().isShutdown()){
 				retry();
 			}
 		} finally {

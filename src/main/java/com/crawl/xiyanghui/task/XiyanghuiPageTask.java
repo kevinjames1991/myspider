@@ -15,7 +15,7 @@ import com.crawl.core.util.SimpleInvocationHandler;
 import com.crawl.core.util.SimpleLogger;
 import com.crawl.xiyanghui.entity.ProductInfo;
 import com.crawl.xiyanghui.parser.DetailPageParser;
-import com.crawl.xiyanghui.parser.XiyanghuiNewUserDetailPageParser;
+import com.crawl.xiyanghui.parser.XiyanghuiDetailPageParser;
 import com.crawl.zhihu.ZhiHuHttpClient;
 import com.crawl.zhihu.entity.Page;
 
@@ -33,13 +33,13 @@ public class XiyanghuiPageTask extends AbstractPageTask {
 
     @Override
     void retry() {
-        zhiHuHttpClient.getDetailPageThreadPool().execute(new XiyanghuiPageTask(url, Config.isProxy));
+    	xiYangHuiHttpClient.getDetailPageThreadPool().execute(new XiyanghuiPageTask(url, Config.isProxy));
     }
 
     @Override
     void handle(Page page) {
         DetailPageParser parser = null;
-        parser = XiyanghuiNewUserDetailPageParser.getInstance();
+        parser = XiyanghuiDetailPageParser.getInstance();
         List<ProductInfo> infoList = parser.parse(page);
         if (infoList != null) {
         	System.out.println("解析页面成功:" + infoList.size());
@@ -72,7 +72,7 @@ public class XiyanghuiPageTask extends AbstractPageTask {
      * @return
      */
     private static DetailPageParser getProxyDetailParser(){
-        DetailPageParser detailPageParser = XiyanghuiNewUserDetailPageParser.getInstance();
+        DetailPageParser detailPageParser = XiyanghuiDetailPageParser.getInstance();
         InvocationHandler invocationHandler = new SimpleInvocationHandler(detailPageParser);
         DetailPageParser proxyDetailPageParser = (DetailPageParser) Proxy.newProxyInstance(detailPageParser.getClass().getClassLoader(),
                 detailPageParser.getClass().getInterfaces(), invocationHandler);

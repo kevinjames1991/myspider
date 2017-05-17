@@ -14,7 +14,7 @@ import com.crawl.zhihu.ZhiHuHttpClient;
 public class Main {
     private static Logger logger = SimpleLogger.getLogger(Main.class);
     public static void main(String args []){
-        String startURL = Config.startURL;
+        String startURL = Config.startURLZhihu;
 //        ProxyHttpClient.getInstance().startCrawl();
         System.out.println(startURL);
         ZhiHuHttpClient.getInstance().startCrawl(startURL);

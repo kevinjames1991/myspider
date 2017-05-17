@@ -76,10 +76,9 @@ public abstract class AbstractPageTask implements Runnable{
 			int status = page.getStatusCode();
 			if(status == HttpStatus.SC_OK){
 //				System.out.println(page.getHtml());
-				handle(page);//解析获取到的页面内容
 				if (page.getHtml().contains("zhihu")){
 					logger.debug(Thread.currentThread().getName() + " " + getProxyStr(currentProxy)  + " statusCode:" + status + "  executing request " + page.getUrl());
-					currentProxy.setSuccessfulTimes(currentProxy.getSuccessfulTimes() + 1);
+//					currentProxy.setSuccessfulTimes(currentProxy.getSuccessfulTimes() + 1);
 					handle(page);//解析获取到的页面内容
 				}else {
 					/**
