@@ -20,7 +20,7 @@ import com.crawl.zhihu.ZhiHuHttpClient;
 import com.crawl.zhihu.entity.Page;
 
 /**
- * 
+ * 产品详情页解析类
  * @author chenzhangwei
  * @time 2017年5月16日下午4:13:44
  */
@@ -38,9 +38,11 @@ public class DetailPageParser {
         }
         return instance;
     }
+    
     private DetailPageParser(){
 
     }
+    
     public List<ProductInfo> parse(Page page) {
     	List<ProductInfo> infoList = new ArrayList<>();
         Document doc = Jsoup.parse(page.getHtml());
@@ -52,10 +54,16 @@ public class DetailPageParser {
         	getProductInfo(productInfo,productUrl);
         	XiYangHuiHttpClient.parseProductCount.incrementAndGet();
         	infoList.add(productInfo);
+        	LOGGER.info(productUrl);
 		}
         return infoList;
     }
     
+    /**
+     * 获取产品详细信息
+     * @param info
+     * @param productUrl
+     */
     private void getProductInfo(ProductInfo info, String productUrl){
     	try {
     		Page page = XiYangHuiHttpClient.getInstance().getWebPage(productUrl);
@@ -102,14 +110,14 @@ public class DetailPageParser {
     		info.setBrandDesc(brandDesc);
     		String shopDesc = details.select(".panel-body").select(".site_desc").first().text().replaceAll("查看此商家全部商品", "");
     		info.setShopDesc(shopDesc);
-    		LOGGER.info(info.toString());
+//    		LOGGER.info(info.toString());
 		} catch (Exception e) {
-			LOGGER.error("parse error",e);
+//			LOGGER.error("parse error",e);
 		}
     }
 
     /**
-     * 
+     * 获取产品详情页URL
      * @param url
      * @return
      */

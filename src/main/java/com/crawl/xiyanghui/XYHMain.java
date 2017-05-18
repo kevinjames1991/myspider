@@ -9,16 +9,16 @@ import com.crawl.core.util.Config;
 
 public class XYHMain {
     private static Logger logger = LoggerFactory.getLogger(XYHMain.class);
-    private static final int count = 2;
+    private static final int count = 6;//要爬取的页数
     public static CountDownLatch latch = new CountDownLatch(count-1);
     public static void main(String args []){
+    	long begin = System.currentTimeMillis();
         String startURL = Config.startURLXiYangHui;
 //        ProxyHttpClient.getInstance().startCrawl();
-        logger.info(startURL);
         XiYangHuiHttpClient.getInstance().startCrawl(startURL, count);
         try {
 			latch.await();
-			logger.info("all finished");
+			logger.info("all finished"+(System.currentTimeMillis() - begin));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
