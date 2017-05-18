@@ -1,29 +1,32 @@
 package com.crawl.xiyanghui;
 
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.crawl.core.dao.ConnectionManager;
 import com.crawl.core.httpclient.AbstractHttpClient;
 import com.crawl.core.httpclient.IHttpClient;
 import com.crawl.core.util.Config;
-import com.crawl.core.util.SimpleLogger;
 import com.crawl.core.util.ThreadPoolMonitor;
 import com.crawl.proxy.ProxyHttpClient;
 import com.crawl.xiyanghui.task.XiyanghuiPageTask;
 import com.crawl.zhihu.dao.ZhiHuDAO;
 
-public class XiYangHuiHttpClient extends AbstractHttpClient implements IHttpClient{
-    private static Logger logger = SimpleLogger.getSimpleLogger(XiYangHuiHttpClient.class);
+public class XiYangHuiHttpClient extends AbstractHttpClient{
+    private static Logger logger = LoggerFactory.getLogger(XiYangHuiHttpClient.class);
     private volatile static XiYangHuiHttpClient instance;
+    private static String authorization;
+    
     /**
      * 统计用户数量
      */
-    public static AtomicInteger parseUserCount = new AtomicInteger(0);
+    public static AtomicInteger parseProductCount = new AtomicInteger(0);
     private static long startTime = System.currentTimeMillis();
     public static volatile boolean isStop = false;
 
@@ -45,40 +48,52 @@ public class XiYangHuiHttpClient extends AbstractHttpClient implements IHttpClie
      * 列表页下载网页线程池
      */
     private ThreadPoolExecutor listPageThreadPool;
+    private ExecutorService executorService;
     private XiYangHuiHttpClient() {
         initHttpClient();
-        intiThreadPool();
+        intiThreadPool();//初始化线程池
         //开启监控线程,观察爬取线程的状态
-        new Thread(new ThreadPoolMonitor(detailPageThreadPool, "DetailPageDownloadThreadPool")).start();
-        new Thread(new ThreadPoolMonitor(listPageThreadPool, "ListPageDownloadThreadPool")).start();
+//        new Thread(new ThreadPoolMonitor(detailPageThreadPool, "DetailPageDownloadThreadPool")).start();
+//        new Thread(new ThreadPoolMonitor(listPageThreadPool, "ListPageDownloadThreadPool")).start();
     }
     /**
-     * 初始化HttpClient
+     * 初始化
      */
-    @Override
     public void initHttpClient() {
+    	authorization = initAuthorization();//授权
+    	//初始化数据库配置
         if(Config.dbEnable){
             ZhiHuDAO.DBTablesInit(ConnectionManager.getConnection());
         }
     }
-
+    
     /**
      * 初始化线程池
      */
     private void intiThreadPool(){
-        detailPageThreadPool = new ThreadPoolExecutor(Config.downloadThreadSize,
-                Config.downloadThreadSize,
-                0L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<Runnable>());
-        listPageThreadPool = new ThreadPoolExecutor(50, 50,
-                0L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<Runnable>());
+    	executorService = Executors.newFixedThreadPool(10);
     }
     
-    public void startCrawl(String url){
-        detailPageThreadPool.execute(new XiyanghuiPageTask(url, Config.isProxy));
-        manageHttpClient();
+    /**
+     * 初始化authorization
+     * @return
+     */
+    private String initAuthorization(){
+    	return null;
     }
+    
+    public static String getAuthorization(){
+        return authorization;
+    }
+    
+	public void startCrawl(String url, int count) {
+		for (int i = 1; i < count; i++) {
+			String pageUrl = url + "/" + i;
+			executorService.submit(new XiyanghuiPageTask(pageUrl, Config.isProxy));
+		}
+		executorService.shutdown();//关闭线程池
+		// manageHttpClient();
+	}
     /**
      * 关闭整个爬虫
      */
@@ -113,11 +128,11 @@ public class XiYangHuiHttpClient extends AbstractHttpClient implements IHttpClie
                  */
                 ProxyHttpClient.getInstance().getProxyTestThreadExecutor().shutdownNow();
                 logger.info("--------------爬取结果--------------");
-                logger.info("获取用户数:" + parseUserCount.get());
+                logger.info("获取用户数:" + parseProductCount.get());
                 break;
             }
             double costTime = (System.currentTimeMillis() - startTime) / 1000.0;//单位s
-            logger.debug("抓取速率：" + parseUserCount.get() / costTime + "个/s");
+            logger.debug("抓取速率：" + parseProductCount.get() / costTime + "个/s");
 //            logger.info("downloadFailureProxyPageSet size:" + ProxyHttpClient.downloadFailureProxyPageSet.size());
             try {
                 Thread.sleep(1000);

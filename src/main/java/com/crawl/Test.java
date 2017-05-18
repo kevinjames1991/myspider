@@ -21,22 +21,30 @@ public class Test {
 		Document doc1 = Jsoup.connect("http://www.tv777.net/Aspx/f_filmShows.aspx?id=1").get();
 		for (int i = 1; i < 10; i++) {
 			String baseUrl = "http://www.xiyanghui.com/women/" + i;
-			SERVICE.submit(() -> {
+			SERVICE.submit(
+				new Runnable() {
+					public void run() {
+						System.out.println("11");
+					}
+				}
+					/*() -> {
 				Document doc;
 				try {
-					doc = Jsoup.connect(baseUrl).get();
-					Elements titles = doc.select("div.title");
-					for (Iterator<Element> iterator = titles.iterator(); iterator.hasNext();) {
-						Element title = iterator.next();
-						Element sElement = title.select("a").first();
-						String productUrl = sElement.attr("href");
-						Document docProduct = Jsoup.connect(productUrl).get();
-						System.out.println(docProduct.select("h5").first().text());
-					}
+					Thread.sleep(1000);
+					System.out.println("a");
+//					doc = Jsoup.connect(baseUrl).get();
+//					Elements titles = doc.select("div.title");
+//					for (Iterator<Element> iterator = titles.iterator(); iterator.hasNext();) {
+//						Element title = iterator.next();
+//						Element sElement = title.select("a").first();
+//						String productUrl = sElement.attr("href");
+//						Document docProduct = Jsoup.connect(productUrl).get();
+//						System.out.println(docProduct.select("h5").first().text());
+//					}
 				} catch (Exception e) {
 					logger.error(baseUrl + "=====error" + e);
 				}
-			});
+			}*/);
 		}
 		SERVICE.shutdown();
 		System.out.println("finish");

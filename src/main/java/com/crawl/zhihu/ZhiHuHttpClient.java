@@ -61,7 +61,7 @@ public class ZhiHuHttpClient extends AbstractHttpClient implements IHttpClient{
      */
     @Override
     public void initHttpClient() {
-//        authorization = initAuthorization();//授权
+        authorization = initAuthorization();//授权
         if(Config.dbEnable){
             ZhiHuDAO.DBTablesInit(ConnectionManager.getConnection());
         }

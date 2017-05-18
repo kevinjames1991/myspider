@@ -1,21 +1,34 @@
 package com.crawl.xiyanghui.task;
 
-import com.crawl.core.util.HttpClientUtil;
-import com.crawl.proxy.ProxyPool;
-import com.crawl.proxy.entity.Direct;
-import com.crawl.proxy.entity.Proxy;
-import com.crawl.xiyanghui.XiYangHuiHttpClient;
-import com.crawl.zhihu.entity.Page;
-import com.crawl.core.util.SimpleLogger;
+import static com.crawl.core.util.Constants.TIME_INTERVAL;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.http.HttpHost;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.log4j.Logger;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
-import static com.crawl.core.util.Constants.TIME_INTERVAL;
+import com.crawl.core.httpclient.AbstractHttpClient;
+import com.crawl.core.util.HttpClientUtil;
+import com.crawl.proxy.ProxyPool;
+import com.crawl.proxy.entity.Direct;
+import com.crawl.proxy.entity.Proxy;
+import com.crawl.xiyanghui.XYHMain;
+import com.crawl.xiyanghui.XiYangHuiHttpClient;
+import com.crawl.xiyanghui.entity.ProductInfo;
+import com.crawl.zhihu.ZhiHuHttpClient;
+import com.crawl.zhihu.entity.Page;
 
 /**
  * 下载网页任务， 下载成功的Page放到解析线程池
@@ -23,26 +36,29 @@ import static com.crawl.core.util.Constants.TIME_INTERVAL;
  * @see ProxyPool
  */
 public abstract class AbstractPageTask implements Runnable{
-	private static Logger logger = SimpleLogger.getSimpleLogger(AbstractPageTask.class);
+	private static Logger logger = LoggerFactory.getLogger(AbstractPageTask.class);
 	protected String url;
 	protected HttpRequestBase request;
 	private boolean proxyFlag;//是否通过代理下载
 	private Proxy currentProxy;//当前线程使用的代理
-
-	protected static XiYangHuiHttpClient xiYangHuiHttpClient = XiYangHuiHttpClient.getInstance();
+	private AbstractHttpClient httpClient;
+	
 	public AbstractPageTask(){
 
 	}
 	//详情页
-	public AbstractPageTask(String url, boolean proxyFlag){
+	public AbstractPageTask(AbstractHttpClient httpClient,String url, boolean proxyFlag){
+		this.httpClient = httpClient;
 		this.url = url;
 		this.proxyFlag = proxyFlag;
 	}
+	
 	//列表页
 	public AbstractPageTask(HttpRequestBase request, boolean proxyFlag){
 		this.request = request;
 		this.proxyFlag = proxyFlag;
 	}
+
 	public void run(){
 		HttpGet tempReqeust = null;
 		try {
@@ -55,9 +71,9 @@ public abstract class AbstractPageTask implements Runnable{
 						HttpHost proxy = new HttpHost(currentProxy.getIp(), currentProxy.getPort());
 						tempReqeust.setConfig(HttpClientUtil.getRequestConfigBuilder().setProxy(proxy).build());
 					}
-					page = xiYangHuiHttpClient.getWebPage(tempReqeust);
+					page = httpClient.getWebPage(tempReqeust);
 				}else {
-					page = xiYangHuiHttpClient.getWebPage(url);
+					page = httpClient.getWebPage(url);
 				}
 			}
 			if(request != null){
@@ -67,18 +83,17 @@ public abstract class AbstractPageTask implements Runnable{
 						HttpHost proxy = new HttpHost(currentProxy.getIp(), currentProxy.getPort());
 						request.setConfig(HttpClientUtil.getRequestConfigBuilder().setProxy(proxy).build());
 					}
-					page = xiYangHuiHttpClient.getWebPage(request);
+					page = httpClient.getWebPage(request);
 				}else {
-					page = xiYangHuiHttpClient.getWebPage(request);
+					page = httpClient.getWebPage(request);
 				}
 			}
 			page.setProxy(currentProxy);
 			int status = page.getStatusCode();
 			if(status == HttpStatus.SC_OK){
-//				System.out.println(page.getHtml());
 				if (page.getHtml().contains("xiyanghui")){
 					if (currentProxy != null) {
-						System.out.println(Thread.currentThread().getName() + " " + getProxyStr(currentProxy)  + " statusCode:" + status + "  executing request " + page.getUrl());
+						logger.info(Thread.currentThread().getName() + " " + getProxyStr(currentProxy)  + " statusCode:" + status + "  executing request " + page.getUrl());
 						currentProxy.setSuccessfulTimes(currentProxy.getSuccessfulTimes() + 1);
 					}
 					handle(page);
@@ -89,15 +104,12 @@ public abstract class AbstractPageTask implements Runnable{
 					logger.warn("proxy exception:" + currentProxy.toString());
 				}
 
-			}
-			/**
-			 * 401--不能通过验证
-			 */
-			else if(status == 404 || status == 401 ||
-					status == 410){
+			} else if(status == 404 || status == 401 || status == 410){
+					/**
+					 * 401--不能通过验证
+					 */
 				logger.warn(Thread.currentThread().getName() + " " + getProxyStr(currentProxy)  + " statusCode:" + status + "  executing request " + page.getUrl());
-			}
-			else {
+			} else {
 				logger.error(Thread.currentThread().getName() + " " + getProxyStr(currentProxy)  + " statusCode:" + status + "  executing request " + page.getUrl());
 				Thread.sleep(100);
 				retry();
@@ -111,17 +123,18 @@ public abstract class AbstractPageTask implements Runnable{
                  */
                 currentProxy.setFailureTimes(currentProxy.getFailureTimes() + 1);
             }
-            if(!xiYangHuiHttpClient.getDetailPageThreadPool().isShutdown()){
-				retry();
-			}
+//            if(!httpClient.getDetailPageThreadPool().isShutdown()){
+//				retry();
+//			}
 		} finally {
-			if (request != null){
-				request.releaseConnection();
-			}
-			if (tempReqeust != null){
-				tempReqeust.releaseConnection();
-			}
-			setProxyUseStrategy();
+//			if (request != null){
+//				request.releaseConnection();
+//			}
+//			if (tempReqeust != null){
+//				tempReqeust.releaseConnection();
+//			}
+//			setProxyUseStrategy();
+//			logger.info("finished");
 		}
 	}
 

@@ -1,6 +1,7 @@
 package com.crawl.xiyanghui.entity;
 
 import java.util.Date;
+import java.util.List;
 
 public class ProductInfo {
     private String skuId;//产品id（西洋汇SKU_ID）
@@ -26,8 +27,12 @@ public class ProductInfo {
     private String model;//型号
 
     private String years;//年份
+    
+    private String discount;//折扣
 
     private String season;//季度
+    
+    private String shopDesc;//商家介绍
 
     private String style;//风格描述
 
@@ -157,6 +162,8 @@ public class ProductInfo {
     private String status;//状态
     
     private String lotNo;//批次号
+    
+    private List<ProductPhoto> photoList;//产品图片列表
 
     public String getShopCode() {
 		return shopCode;
@@ -777,50 +784,57 @@ public class ProductInfo {
 	public void setLotNo(String lotNo) {
 		this.lotNo = lotNo;
 	}
+	
+	public String getDiscount() {
+		return discount;
+	}
+
+	public void setDiscount(String discount) {
+		this.discount = discount;
+	}
+	
+	public String getShopDesc() {
+		return shopDesc;
+	}
+
+	public void setShopDesc(String shopDesc) {
+		this.shopDesc = shopDesc;
+	}
+	
+	public List<ProductPhoto> getPhotoList() {
+		return photoList;
+	}
+
+	public void setPhotoList(List<ProductPhoto> photoList) {
+		this.photoList = photoList;
+	}
 
 	@Override
 	public String toString() {
-		return "DProductInfoShop [skuId=" + skuId + ", name=" + name
-				+ ", longname=" + longname + ", originno=" + originno
-				+ ", ismicrodiscount=" + ismicrodiscount + ", microdiscount="
-				+ microdiscount + ", origincolor=" + origincolor
-				+ ", productno=" + productno + ", origin=" + origin
-				+ ", collection=" + collection + ", model=" + model
-				+ ", years=" + years + ", season=" + season + ", style="
-				+ style + ", material=" + material + ", waveband=" + waveband
-				+ ", productgroup=" + productgroup + ", exestandard="
-				+ exestandard + ", salftype=" + salftype + ", rank=" + rank
-				+ ", component1=" + component1 + ", componentdesc="
-				+ componentdesc + ", unit=" + unit + ", isbondedproduct="
-				+ isbondedproduct + ", colornumber=" + colornumber
-				+ ", registnumber=" + registnumber + ", ciqgoodsno="
-				+ ciqgoodsno + ", hscode=" + hscode + ", newproduct="
-				+ newproduct + ", productDesc=" + productDesc + ", onhand="
-				+ onhand + ", onhandlabel=" + onhandlabel + ", originPriceWas="
-				+ originPriceWas + ", originPriceNow=" + originPriceNow
-				+ ", priceWas=" + priceWas + ", priceNow=" + priceNow
-				+ ", sellerName=" + sellerName + ", sellerUrl=" + sellerUrl
-				+ ", sellerRebateUrl=" + sellerRebateUrl + ", sellerCountry="
-				+ sellerCountry + ", sellerType=" + sellerType
-				+ ", sellerLanguage=" + sellerLanguage + ", sellerDesc="
-				+ sellerDesc + ", sellerPayment=" + sellerPayment
-				+ ", sellerFreights=" + sellerFreights + ", sellerSource="
-				+ sellerSource + ", sellerReturnDay=" + sellerReturnDay
-				+ ", sellerService=" + sellerService + ", brandEn=" + brandEn
-				+ ", brandCn=" + brandCn + ", brandCountry=" + brandCountry
-				+ ", brandDesc=" + brandDesc + ", brandLogo=" + brandLogo
-				+ ", canBuy=" + canBuy + ", freight=" + freight
-				+ ", freightNote=" + freightNote + ", incomingFreight="
-				+ incomingFreight + ", weight=" + weight + ", siteFreight="
-				+ siteFreight + ", colorId=" + colorId + ", colorName="
-				+ colorName + ", colorSample=" + colorSample + ", sizeId="
-				+ sizeId + ", sizeName=" + sizeName + ", shopId=" + shopId
-				+ ", subjectId=" + subjectId + ", createBy=" + createBy
-				+ ", createTime=" + createTime + ", updateBy=" + updateBy
-				+ ", updateTime=" + updateTime + ", taobaoFreight="
-				+ taobaoFreight + ", modernCalcPrice=" + modernCalcPrice
-				+ ", productSku=" + productSku + ", url=" + url + ", shopCode="
-				+ shopCode + ", status=" + status + ", lotNo=" + lotNo + "]";
+		return "ProductInfo [skuId=" + skuId + ", name=" + name + ", longname=" + longname + ", originno=" + originno
+				+ ", ismicrodiscount=" + ismicrodiscount + ", microdiscount=" + microdiscount + ", origincolor="
+				+ origincolor + ", productno=" + productno + ", origin=" + origin + ", collection=" + collection
+				+ ", model=" + model + ", years=" + years + ", discount=" + discount + ", season=" + season
+				+ ", shopDesc=" + shopDesc + ", style=" + style + ", material=" + material + ", waveband=" + waveband
+				+ ", productgroup=" + productgroup + ", exestandard=" + exestandard + ", salftype=" + salftype
+				+ ", rank=" + rank + ", component1=" + component1 + ", componentdesc=" + componentdesc + ", unit="
+				+ unit + ", isbondedproduct=" + isbondedproduct + ", colornumber=" + colornumber + ", registnumber="
+				+ registnumber + ", ciqgoodsno=" + ciqgoodsno + ", hscode=" + hscode + ", newproduct=" + newproduct
+				+ ", productDesc=" + productDesc + ", onhand=" + onhand + ", onhandlabel=" + onhandlabel
+				+ ", originPriceWas=" + originPriceWas + ", originPriceNow=" + originPriceNow + ", priceWas=" + priceWas
+				+ ", priceNow=" + priceNow + ", sellerName=" + sellerName + ", sellerUrl=" + sellerUrl
+				+ ", sellerRebateUrl=" + sellerRebateUrl + ", sellerCountry=" + sellerCountry + ", sellerType="
+				+ sellerType + ", sellerLanguage=" + sellerLanguage + ", sellerDesc=" + sellerDesc + ", sellerPayment="
+				+ sellerPayment + ", sellerFreights=" + sellerFreights + ", sellerSource=" + sellerSource
+				+ ", sellerReturnDay=" + sellerReturnDay + ", sellerService=" + sellerService + ", brandEn=" + brandEn
+				+ ", brandCn=" + brandCn + ", brandCountry=" + brandCountry + ", brandDesc=" + brandDesc
+				+ ", brandLogo=" + brandLogo + ", canBuy=" + canBuy + ", freight=" + freight + ", freightNote="
+				+ freightNote + ", incomingFreight=" + incomingFreight + ", weight=" + weight + ", siteFreight="
+				+ siteFreight + ", colorId=" + colorId + ", colorName=" + colorName + ", colorSample=" + colorSample
+				+ ", sizeId=" + sizeId + ", sizeName=" + sizeName + ", shopId=" + shopId + ", subjectId=" + subjectId
+				+ ", createBy=" + createBy + ", createTime=" + createTime + ", updateBy=" + updateBy + ", updateTime="
+				+ updateTime + ", taobaoFreight=" + taobaoFreight + ", modernCalcPrice=" + modernCalcPrice
+				+ ", productSku=" + productSku + ", url=" + url + ", shopCode=" + shopCode + ", status=" + status
+				+ ", lotNo=" + lotNo + ", photoList=" + photoList + "]";
 	}
-
 }
