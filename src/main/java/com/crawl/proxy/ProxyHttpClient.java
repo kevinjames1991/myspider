@@ -1,20 +1,5 @@
 package com.crawl.proxy;
 
-import com.crawl.core.util.HttpClientUtil;
-import com.crawl.core.util.ThreadPoolMonitor;
-import com.crawl.proxy.entity.Direct;
-import com.crawl.proxy.entity.Proxy;
-import com.crawl.proxy.site.ProxyListPageParserFactory;
-import com.crawl.proxy.task.ProxyTestTask;
-import com.crawl.core.httpclient.AbstractHttpClient;
-import com.crawl.zhihu.ZhiHuHttpClient;
-import com.crawl.zhihu.entity.Page;
-import org.apache.http.HttpHost;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.log4j.Logger;
-
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -23,8 +8,25 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.http.HttpHost;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.crawl.core.httpclient.AbstractHttpClient;
+import com.crawl.core.util.HttpClientUtil;
+import com.crawl.core.util.ThreadPoolMonitor;
+import com.crawl.proxy.entity.Direct;
+import com.crawl.proxy.entity.Proxy;
+import com.crawl.proxy.site.ProxyListPageParserFactory;
+import com.crawl.proxy.task.ProxyTestTask;
+import com.crawl.zhihu.ZhiHuHttpClient;
+import com.crawl.zhihu.entity.Page;
+
 public class ProxyHttpClient extends AbstractHttpClient {
-    private static final Logger logger = Logger.getLogger(ProxyHttpClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProxyHttpClient.class);
     private volatile static ProxyHttpClient instance;
     public static Set<Page> downloadFailureProxyPageSet = new HashSet<>(ProxyPool.proxyMap.size());
 

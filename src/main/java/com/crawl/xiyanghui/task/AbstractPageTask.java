@@ -127,14 +127,13 @@ public abstract class AbstractPageTask implements Runnable{
 //				retry();
 //			}
 		} finally {
-//			if (request != null){
-//				request.releaseConnection();
-//			}
-//			if (tempReqeust != null){
-//				tempReqeust.releaseConnection();
-//			}
-//			setProxyUseStrategy();
-//			logger.info("finished");
+			if (request != null){
+				request.releaseConnection();
+			}
+			if (tempReqeust != null){
+				tempReqeust.releaseConnection();
+			}
+			setProxyUseStrategy();
 		}
 	}
 
