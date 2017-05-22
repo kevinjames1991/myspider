@@ -133,7 +133,7 @@ public abstract class AbstractPageTask implements Runnable{
 			if (tempReqeust != null){
 				tempReqeust.releaseConnection();
 			}
-			setProxyUseStrategy();
+//			setProxyUseStrategy();
 		}
 	}
 

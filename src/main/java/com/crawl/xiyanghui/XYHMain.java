@@ -10,12 +10,12 @@ import com.crawl.proxy.ProxyHttpClient;
 
 public class XYHMain {
     private static Logger logger = LoggerFactory.getLogger(XYHMain.class);
-    private static final int count = 5;//要爬取的页数
+    private static final int count = 2;//要爬取的页数
     public static CountDownLatch latch = new CountDownLatch(count-1);
     public static void main(String args []){
     	long begin = System.currentTimeMillis();
         String startURL = Config.startURLXiYangHui;
-        ProxyHttpClient.getInstance().startCrawl();
+//        ProxyHttpClient.getInstance().startCrawl();
         XiYangHuiHttpClient.getInstance().startCrawl(startURL, count);
         try {
 			latch.await();
