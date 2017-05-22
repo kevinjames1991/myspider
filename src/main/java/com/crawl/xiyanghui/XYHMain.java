@@ -9,7 +9,7 @@ import com.crawl.core.util.Config;
 
 public class XYHMain {
     private static Logger logger = LoggerFactory.getLogger(XYHMain.class);
-    private static final int count = 6;//要爬取的页数
+    private static final int count = 5;//要爬取的页数
     public static CountDownLatch latch = new CountDownLatch(count-1);
     public static void main(String args []){
     	long begin = System.currentTimeMillis();
@@ -20,7 +20,7 @@ public class XYHMain {
 			latch.await();
 			logger.info("all finished"+(System.currentTimeMillis() - begin));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("ERROR:",e);
 		}
     }
 }
