@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.crawl.core.util.Config;
+import com.crawl.proxy.ProxyHttpClient;
 
 public class XYHMain {
     private static Logger logger = LoggerFactory.getLogger(XYHMain.class);
@@ -14,7 +15,7 @@ public class XYHMain {
     public static void main(String args []){
     	long begin = System.currentTimeMillis();
         String startURL = Config.startURLXiYangHui;
-//        ProxyHttpClient.getInstance().startCrawl();
+        ProxyHttpClient.getInstance().startCrawl();
         XiYangHuiHttpClient.getInstance().startCrawl(startURL, count);
         try {
 			latch.await();
